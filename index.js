@@ -5,6 +5,7 @@ import delay from 'delay';
 const parser = new ArgumentParser();
 parser.add_argument('-p', '--price', { nargs: 1, default: 1500, type: 'int' });
 parser.add_argument('-n', '--pages', { nargs: 1, default: 5, type: 'int' });
+parser.add_argument('-o', '--page-offset', { nargs: 1, default: 0, type: 'int' });
 parser.add_argument('-a', '--art', { action: 'store_true' });
 parser.add_argument('-v', '--voice', { action: 'store_true' });
 parser.add_argument('-t', '--text', { action: 'store_true' });
@@ -24,7 +25,7 @@ console.log('=============================');
 let i = 0;
 while (i < args['pages']) {
     console.log(`* Retrieving page ${i+1} of artists *`)
-    const skebbers = await getSkebbers(i);
+    const skebbers = await getSkebbers(i + args['page_offset']);
     for (let skebberObj of skebbers) {
         const isActive = skebberObj['acceptable'];
         const matchesGenre =
@@ -33,7 +34,7 @@ while (i < args['pages']) {
             ( skebberObj['genre'] === 'novel' && args['text'] );
         const matchesNsfw =
             !skebberObj['nsfw_acceptable'] ||
-            ( skebberObj['nsfw_acceptable'] && !args['no-nsfw'] );
+            ( skebberObj['nsfw_acceptable'] && !args['no_nsfw'] );
 
         if (isActive && matchesGenre && matchesNsfw) {
             console.log(`* Retrieving ${skebberObj['screen_name']} *`);
@@ -41,8 +42,8 @@ while (i < args['pages']) {
             if (profile['default_amount'] <= args['price']) {
                 discoveredSkebbers.push(profile);
             }
-            console.log('* Waiting 5 seconds to perform the next request *');
-            await delay(5 * 1000);
+            console.log('* Waiting 2 seconds to perform the next request *');
+            await delay(2 * 1000);
         } else {
             console.log(`* Skipping ${skebberObj['screen_name']} *`);
         }
