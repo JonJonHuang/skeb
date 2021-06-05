@@ -14,45 +14,64 @@ const args = parser.parse_args();
 
 const discoveredSkebbers = [];
 
-console.log('Searching for:');
-args['art'] ? console.log('    * Artists') : null;
-args['voice'] ? console.log('    * Voice actors') : null;
-args['text'] ? console.log('    * Writers') : null;
-console.log(`Over ${args['pages']} pages`);
-console.log(`And under ${args['price']} yen`);
-console.log('=============================');
-
-let i = 0;
-while (i < args['pages']) {
-    console.log(`* Retrieving page ${i+1} of artists *`)
-    const skebbers = await getSkebbers(i + args['page_offset']);
-    for (let skebberObj of skebbers) {
-        const isActive = skebberObj['acceptable'];
-        const matchesGenre =
-            ( skebberObj['genre'] === 'art' && args['art'] ) ||
-            ( skebberObj['genre'] === 'voice' && args['voice'] ) ||
-            ( skebberObj['genre'] === 'novel' && args['text'] );
-        const matchesNsfw =
-            !skebberObj['nsfw_acceptable'] ||
-            ( skebberObj['nsfw_acceptable'] && !args['no_nsfw'] );
-
-        if (isActive && matchesGenre && matchesNsfw) {
-            console.log(`* Retrieving ${skebberObj['screen_name']} *`);
-            const profile = await getSkebber(skebberObj['screen_name']);
-            if (profile['default_amount'] <= args['price']) {
-                discoveredSkebbers.push(profile);
+async function processPage(i) {
+    try {
+        console.log(`* Retrieving page ${i+1} of artists`)
+        const skebbers = await getSkebbers(i + args['page_offset']);
+        for (let skebberObj of skebbers) {
+            const isActive = skebberObj['acceptable'];
+            const matchesGenre =
+                ( skebberObj['genre'] === 'art' && args['art'] ) ||
+                ( skebberObj['genre'] === 'voice' && args['voice'] ) ||
+                ( skebberObj['genre'] === 'novel' && args['text'] );
+            const matchesNsfw =
+                !skebberObj['nsfw_acceptable'] ||
+                ( skebberObj['nsfw_acceptable'] && !args['no_nsfw'] );
+    
+            if (isActive && matchesGenre && matchesNsfw) {
+                await processSkebber(skebberObj['screen_name']);
+            } else {
+                console.log(`* Skipping ${skebberObj['screen_name']}`);
             }
-            console.log('* Waiting 2 seconds to perform the next request *');
-            await delay(2 * 1000);
-        } else {
-            console.log(`* Skipping ${skebberObj['screen_name']} *`);
         }
+    } catch (e) {
+        console.log(`- ERROR: Failed to retrieve page ${i+1} of skebbers, skipping page`);
     }
-
-    i++;
 }
 
-let urls = discoveredSkebbers.map(val => `https://skeb.jp/@${val['screen_name']}`);
-urls.forEach((url) => {
-    console.log(url);
-});
+async function processSkebber(screenName) {
+    try {
+        console.log(`* Retrieving ${screenName}`);
+        const profile = await getSkebber(screenName);
+        if (profile['default_amount'] <= args['price']) {
+            discoveredSkebbers.push(profile);
+        }
+        console.log('* Waiting 2 seconds to perform the next request');
+        await delay(2 * 1000);
+    } catch (e) {
+        console.log(`- ERROR: There was an error getting ${screenName}'s data`)
+    }
+}
+
+async function main() {
+    console.log('Searching for:');
+    args['art'] ? console.log('    * Artists') : null;
+    args['voice'] ? console.log('    * Voice actors') : null;
+    args['text'] ? console.log('    * Writers') : null;
+    console.log(`Over ${args['pages']} pages`);
+    console.log(`And under ${args['price']} yen`);
+    console.log('=============================');
+    
+    let i = 0;
+    while (i < args['pages']) {
+        await processPage(i);
+        i++;
+    }
+    
+    let urls = discoveredSkebbers.map(val => `https://skeb.jp/@${val['screen_name']}`);
+    urls.forEach((url) => {
+        console.log(url);
+    });
+}
+
+await main();
