@@ -10,5 +10,6 @@ Possible arguments:
     -a, --art: Include to search for artists
     -v, --voice: Include to search for voice actors
     -t, --text: Include to search for writers
+    -c, --console: Console-only mode, skips opening skeb pages in browser
     --no-nsfw: Include to ignore nsfw skebbers
 ```

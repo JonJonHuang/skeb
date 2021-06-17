@@ -1,7 +1,7 @@
 {
   "name": "skeb-scraper",
   "version": "1.0.0",
-  "description": "Performs a request to skeb.jp that is stored in a SQLite database. Allows formatting and filtering of skeb accounts.",
+  "description": "Performs a request to skeb.jp. Allows formatting and filtering of skeb accounts.",
   "main": "index.js",
   "scripts": {
     "test": "test",
@@ -12,6 +12,7 @@
   "dependencies": {
     "argparse": "^2.0.1",
     "axios": "^0.21.1",
+    "chalk": "^4.1.1",
     "delay": "^5.0.0",
     "https": "^1.0.0"
   },
