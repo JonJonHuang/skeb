@@ -17,7 +17,12 @@ async function getSkebbers(page) {
 
 async function getSkebber(name) {
     const pathParam = `/${name}`;
-    const response = await connection.get(HOST + GET_USERS_PATH + pathParam);
+    const response = await connection.get(HOST + GET_USERS_PATH + pathParam, {
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': 'Bearer null'
+        }
+    });
     return response.data;
 }
 
