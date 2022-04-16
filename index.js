@@ -78,7 +78,7 @@ async function main() {
     discoveredSkebbers.forEach((skebber) => {
         let url = `https://skeb.jp/@${skebber['screen_name']}`;
         console.log(url);
-        if(!args['console']) {
+        if(!args['console'] && discoveredSkebbers.length <= 25) {
             child.exec(`${start} ${url}`);
         }
     });
