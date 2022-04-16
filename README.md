@@ -4,7 +4,8 @@ npm start -- <arguments>
 
 Possible arguments:
 
-    -p, --price: Price in Yen to find under (default 1500)
+    -l, --lower-bound: Lower bound for price in Yen (default 1000)
+    -u, --upper-bound: Upper bound for price in Yen (default 2000)
     -o, --page-offset: Number of pages to skip (default 0)
     -n, --pages: Number of pages (90 skeb users per page) to search through (default 5)
     -a, --art: Include to search for artists

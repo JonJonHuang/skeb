@@ -5,7 +5,8 @@ import child from 'child_process';
 import delay from 'delay';
 
 const parser = new ArgumentParser();
-parser.add_argument('-p', '--price', { nargs: 1, default: 1500, type: 'int' });
+parser.add_argument('-l', '--lower-bound', { nargs: 1, default: 1000, type: 'int' });
+parser.add_argument('-u', '--upper-bound', { nargs: 1, default: 2000, type: 'int' });
 parser.add_argument('-n', '--pages', { nargs: 1, default: 5, type: 'int' });
 parser.add_argument('-o', '--page-offset', { nargs: 1, default: 0, type: 'int' });
 parser.add_argument('-a', '--art', { action: 'store_true' });
@@ -46,7 +47,7 @@ async function processSkebber(screenName) {
     try {
         console.log(chalk.blueBright(`* Retrieving ${screenName}`));
         const profile = await getSkebber(screenName);
-        if (profile['default_amount'] <= args['price']) {
+        if (profile['default_amount'] >= args['lower_bound'] && profile['default_amount'] <= args['upper_bound']) {
             discoveredSkebbers.push(profile);
         }
         await delay(2 * 1000);
@@ -61,7 +62,7 @@ async function main() {
     args['voice'] ? console.log('    * Voice actors') : null;
     args['text'] ? console.log('    * Writers') : null;
     console.log(`Over ${args['pages']} pages`);
-    console.log(`And under ${args['price']} yen`);
+    console.log(`And between ${args['lower_bound']} and ${args['upper_bound']} yen`);
     console.log('=============================');
     
     let i = 0;
